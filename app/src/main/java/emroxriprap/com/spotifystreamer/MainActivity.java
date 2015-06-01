@@ -1,11 +1,11 @@
 package emroxriprap.com.spotifystreamer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.text.Layout;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,9 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyService;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -50,6 +46,7 @@ public class MainActivity extends ActionBarActivity {
         adapter = new MyCustomAdapter(this,dataList);
         ListView listView = (ListView)findViewById(R.id.lv_search_results);
         listView.setAdapter(adapter);
+
 
         searchView = (SearchView)findViewById(R.id.sv_artist_search);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -245,14 +242,23 @@ public class MainActivity extends ActionBarActivity {
             View rowView = inflater.inflate(R.layout.artist_list_item,parent,false);
             TextView artistName = (TextView)rowView.findViewById(R.id.tv_artist_name);
             ImageView imageView = (ImageView)rowView.findViewById(R.id.iv_small);
-            ArtistEntry ae = list.get(position);
+            final ArtistEntry ae = list.get(position);
             artistName.setText(ae.getArtistName());
-//            String imgUrl = ae.getImageUrlString();
-//           Log.e(LOG_TAG,"IMAGEURL val is "+ imgUrl);
+
+
             if (ae.getImageUrlString()!=null){
                 Picasso.with(context).load(ae.getImageUrlString()).into(imageView);
             }
 
+            rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getContext(),TopTenActivity.class);
+                    intent.putExtra("id",ae.getSpotifyId());
+                    intent.putExtra("artist",ae.getArtistName());
+                    startActivity(intent);
+                }
+            });
             return rowView;
         }
     }
