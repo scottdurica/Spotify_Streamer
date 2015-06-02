@@ -67,7 +67,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        List<ArtistEntry> dataList = new ArrayList<ArtistEntry>();
         adapter = new MyCustomAdapter(this,artistEntries);
         ListView listView = (ListView)findViewById(R.id.lv_search_results);
         listView.setEmptyView(findViewById(R.id.empty_list_view));
@@ -174,7 +173,6 @@ public class MainActivity extends ActionBarActivity {
                 ArtistEntry ae = new ArtistEntry(id,name,imageUrl);
                 artistEntries.add(ae);
 //                Log.d(LOG_TAG,"IMAGEURL val is "+ ae.getImageUrlString());
-
 //                Log.e(LOG_TAG,"Artist ID is "+ id );
 //                Log.e(LOG_TAG,"Artist NAME is "+ name );
 //                Log.e(LOG_TAG,"Artist IMAGEURL is "+ imageUrl );
@@ -194,7 +192,6 @@ public class MainActivity extends ActionBarActivity {
             Pager<Artist>list = p.artists;
             List<Artist> artists = list.items;
             for (Artist a: artists){
-                String artistName = a.name;
                 String thumbImageUrl = null;
 //                Log.d(LOG_TAG,"Artist ID is "+ a.id);
                 List<Image>images = a.images;

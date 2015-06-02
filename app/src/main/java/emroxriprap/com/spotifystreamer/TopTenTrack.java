@@ -78,4 +78,16 @@ public class TopTenTrack implements Parcelable{
         smImgUrl = in.readString();
         lgImgUrl = in.readString();
     }
+    public static final Creator<TopTenTrack> CREATOR = new Parcelable.Creator<TopTenTrack>(){
+
+        @Override
+        public TopTenTrack createFromParcel(Parcel source) {
+            return new TopTenTrack(source);
+        }
+
+        @Override
+        public TopTenTrack[] newArray(int size) {
+            return new TopTenTrack[size];
+        }
+    };
 }

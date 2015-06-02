@@ -38,6 +38,7 @@ public class TopTenActivity extends ActionBarActivity {
 
     private String spotId=null;
     private MyCustomAdapter adapter;
+    ArrayList<TopTenTrack> dataList = new ArrayList<TopTenTrack>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,20 +50,41 @@ public class TopTenActivity extends ActionBarActivity {
         ActionBar bar = getSupportActionBar();
         bar.setTitle("Top Ten Tracks");
         bar.setSubtitle(artistName);
-
-
         FetchTopTenTask task = new FetchTopTenTask();
         task.execute(spotId);
+//        ArrayList<TopTenTrack> dataList = new ArrayList<TopTenTrack>();
+//        adapter = new MyCustomAdapter(this,dataList);
+//        ListView listView = (ListView)findViewById(R.id.lv_top_tracks);
+//        listView.setEmptyView(findViewById(R.id.empty_list_view));
+//        listView.setAdapter(adapter);
 
-        List<TopTenTrack> dataList = new ArrayList<TopTenTrack>();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         adapter = new MyCustomAdapter(this,dataList);
         ListView listView = (ListView)findViewById(R.id.lv_top_tracks);
         listView.setEmptyView(findViewById(R.id.empty_list_view));
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelableArrayList("key", dataList);
+
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        dataList = savedInstanceState.getParcelableArrayList("key");
 
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -129,8 +151,8 @@ public class TopTenActivity extends ActionBarActivity {
                 AlbumSimple albumSimple = t.album;
                 String albumName = albumSimple.name;
                 List<Image>albumImages = albumSimple.images;
-                Log.d(LOG_TAG,"Track Name: "+ trackName);
-                Log.d(LOG_TAG,"Album Name: "+ albumName);
+//                Log.d(LOG_TAG,"Track Name: "+ trackName);
+//                Log.d(LOG_TAG,"Album Name: "+ albumName);
                 if (albumImages !=null){
                     for (Image i: albumImages){
                         int smallestOver600 = 0;
@@ -179,15 +201,12 @@ public class TopTenActivity extends ActionBarActivity {
                 Picasso.with(context).load(track.getSmImgUrl()).into(imageView);
             }
 
-//            rowView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent intent = new Intent(getContext(),TopTenActivity.class);
-//                    intent.putExtra("id",ae.getSpotifyId());
-//                    intent.putExtra("artist",ae.getArtistName());
-//                    startActivity(intent);
-//                }
-//            });
+            rowView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //start new activity to play selected track...
+                }
+            });
             return rowView;
         }
     }
