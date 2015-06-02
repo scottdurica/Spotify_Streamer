@@ -2,11 +2,9 @@ package emroxriprap.com.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -24,14 +23,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import kaaes.spotify.webapi.android.SpotifyApi;
+import kaaes.spotify.webapi.android.SpotifyService;
+import kaaes.spotify.webapi.android.models.Artist;
+import kaaes.spotify.webapi.android.models.ArtistsPager;
+import kaaes.spotify.webapi.android.models.Image;
+import kaaes.spotify.webapi.android.models.Pager;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -45,10 +47,10 @@ public class MainActivity extends ActionBarActivity {
         List<ArtistEntry> dataList = new ArrayList<ArtistEntry>();
         adapter = new MyCustomAdapter(this,dataList);
         ListView listView = (ListView)findViewById(R.id.lv_search_results);
+        listView.setEmptyView(findViewById(R.id.empty_list_view));
         listView.setAdapter(adapter);
-
-
         searchView = (SearchView)findViewById(R.id.sv_artist_search);
+        searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -57,7 +59,6 @@ public class MainActivity extends ActionBarActivity {
 //                Log.d(LOG_TAG,"Artist name sent to request is "+ searchView.getQuery().toString());
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 //this will fire on every change to searchView
@@ -66,7 +67,6 @@ public class MainActivity extends ActionBarActivity {
         });
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -98,11 +98,23 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(List<ArtistEntry> artistEntries) {
             //update the adapter
-            adapter.clear();
-            for (ArtistEntry ae: artistEntries){
-                adapter.add(ae);
+            if (artistEntries == null || artistEntries.size()==0){
+                //No results found.  Tell user to change search
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplication(), "No matching artists found. Please refine your search.", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }else{
+                adapter.clear();
+                for (ArtistEntry ae: artistEntries){
+                    adapter.add(ae);
+                }
             }
-            Log.e(LOG_TAG,"List size is: " + artistEntries.size());
+
+//            Log.e(LOG_TAG,"List size is: " + artistEntries.size());
         }
 
         private List<ArtistEntry> getArtistDataFromJson(String artistJsonString)throws
@@ -151,80 +163,105 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected List<ArtistEntry> doInBackground(String... params) {
 
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            //will contain the raw JSON response
-            String artistJsonString = null;
-
-            try{
-                //Construct the URL for the spotify query
-                //possible params are available at
-                //https://developer.spotify.com/web-api/search-item/
-                //url that I THINK returns what I need.
-                //https://api.spotify.com/v1/search?q=joe%20walsh&type=artist
-                final String ARTIST_BASE_URL ="https://api.spotify.com/v1/search?";
-                final String QUERY_PARAM = "q";
-                final String TYPE_PARAM = "type";
-                final String TYPE = "artist";
-//                Log.e(LOG_TAG,"PARAM[0]: "+ params[0]);
-
-                Uri builtUri = Uri.parse(ARTIST_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM,params[0])
-                        .appendQueryParameter(TYPE_PARAM,TYPE).build();
-                URL url = new URL(builtUri.toString());
-                Log.d(LOG_TAG,"BUILT URL: " + builtUri.toString());
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                    // But it does make debugging a *lot* easier if you print out the completed
-                    // buffer for debugging.
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                artistJsonString = buffer.toString();
-                Log.d(LOG_TAG, "Forecast JSON Sting: " + artistJsonString);
-            }catch (IOException e){
-                Log.e(LOG_TAG, "Error ", e);
-                return null;
-            }finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+            List<ArtistEntry>artistsList = new ArrayList<ArtistEntry>();
+            SpotifyApi api = new SpotifyApi();
+            SpotifyService spotify = api.getService();
+            Map map = new HashMap();
+            map.put("type","artist");
+            ArtistsPager p = spotify.searchArtists(params[0],map);
+            Pager<Artist>list = p.artists;
+            List<Artist> artists = list.items;
+            for (Artist a: artists){
+                String artistName = a.name;
+                String thumbImageUrl = null;
+//                Log.d(LOG_TAG,"Artist ID is "+ a.id);
+                List<Image>images = a.images;
+                if (images !=null){
+                    for (Image i:images){
+                        if (i.height>100){
+                            thumbImageUrl = i.url;
+                        }
                     }
                 }
+//                Log.d(LOG_TAG,"Thumbnail Image URL is "+thumbImageUrl);
+                ArtistEntry artistEntry = new ArtistEntry(a.id,a.name,thumbImageUrl);
+                artistsList.add(artistEntry);
             }
-            try{
-                return getArtistDataFromJson(artistJsonString);
-            }catch (JSONException e){
-                Log.e(LOG_TAG,e.getMessage(),e);
-                e.printStackTrace();
-            }
-            return null;
+//            HttpURLConnection urlConnection = null;
+//            BufferedReader reader = null;
+//
+//            //will contain the raw JSON response
+//            String artistJsonString = null;
+
+//            try{
+//                //Construct the URL for the spotify query
+//                //possible params are available at
+//                //https://developer.spotify.com/web-api/search-item/
+//                //url that I THINK returns what I need.
+//                //https://api.spotify.com/v1/search?q=joe%20walsh&type=artist
+//                final String ARTIST_BASE_URL ="https://api.spotify.com/v1/search?";
+//                final String QUERY_PARAM = "q";
+//                final String TYPE_PARAM = "type";
+//                final String TYPE = "artist";
+////                Log.e(LOG_TAG,"PARAM[0]: "+ params[0]);
+//
+//                Uri builtUri = Uri.parse(ARTIST_BASE_URL).buildUpon()
+//                        .appendQueryParameter(QUERY_PARAM,params[0])
+//                        .appendQueryParameter(TYPE_PARAM,TYPE).build();
+//                URL url = new URL(builtUri.toString());
+//                Log.d(LOG_TAG,"BUILT URL: " + builtUri.toString());
+//
+//                // Create the request to OpenWeatherMap, and open the connection
+//                urlConnection = (HttpURLConnection) url.openConnection();
+//                urlConnection.setRequestMethod("GET");
+//                urlConnection.connect();
+//
+//                // Read the input stream into a String
+//                InputStream inputStream = urlConnection.getInputStream();
+//                StringBuffer buffer = new StringBuffer();
+//                if (inputStream == null) {
+//                    // Nothing to do.
+//                    return null;
+//                }
+//                reader = new BufferedReader(new InputStreamReader(inputStream));
+//
+//                String line;
+//                while ((line = reader.readLine()) != null) {
+//                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+//                    // But it does make debugging a *lot* easier if you print out the completed
+//                    // buffer for debugging.
+//                    buffer.append(line + "\n");
+//                }
+//
+//                if (buffer.length() == 0) {
+//                    // Stream was empty.  No point in parsing.
+//                    return null;
+//                }
+//                artistJsonString = buffer.toString();
+//                Log.d(LOG_TAG, "Forecast JSON Sting: " + artistJsonString);
+//            }catch (IOException e){
+//                Log.e(LOG_TAG, "Error ", e);
+//                return null;
+//            }finally {
+//                if (urlConnection != null) {
+//                    urlConnection.disconnect();
+//                }
+//                if (reader != null) {
+//                    try {
+//                        reader.close();
+//                    } catch (final IOException e) {
+//                        Log.e(LOG_TAG, "Error closing stream", e);
+//                    }
+//                }
+//            }
+//            try{
+//                return getArtistDataFromJson(artistJsonString);
+//            }catch (JSONException e){
+//                Log.e(LOG_TAG,e.getMessage(),e);
+//                e.printStackTrace();
+//            }
+//            return null;
+            return artistsList;
         }
     }
     public class MyCustomAdapter extends ArrayAdapter<ArtistEntry>{
@@ -244,12 +281,9 @@ public class MainActivity extends ActionBarActivity {
             ImageView imageView = (ImageView)rowView.findViewById(R.id.iv_small);
             final ArtistEntry ae = list.get(position);
             artistName.setText(ae.getArtistName());
-
-
             if (ae.getImageUrlString()!=null){
                 Picasso.with(context).load(ae.getImageUrlString()).into(imageView);
             }
-
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
