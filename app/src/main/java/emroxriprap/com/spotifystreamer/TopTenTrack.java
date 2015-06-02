@@ -1,9 +1,12 @@
 package emroxriprap.com.spotifystreamer;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Scott Durica on 6/2/2015.
  */
-public class TopTenTrack {
+public class TopTenTrack implements Parcelable{
 
     private String albumName;
     private String songName;
@@ -11,6 +14,11 @@ public class TopTenTrack {
     private String lgImgUrl;
 
     public TopTenTrack() {
+    }
+
+    //Parcelable constructor
+    public TopTenTrack(Parcel in){
+        readFromParcel(in);
     }
 
     public TopTenTrack(String albumName, String songName, String smImgUrl, String lgImgUrl) {
@@ -50,5 +58,24 @@ public class TopTenTrack {
 
     public void setLgImgUrl(String lgImgUrl) {
         this.lgImgUrl = lgImgUrl;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(albumName);
+        dest.writeString(songName);
+        dest.writeString(smImgUrl);
+        dest.writeString(lgImgUrl);
+    }
+    private void readFromParcel(Parcel in){
+        albumName = in.readString();
+        songName = in.readString();
+        smImgUrl = in.readString();
+        lgImgUrl = in.readString();
     }
 }

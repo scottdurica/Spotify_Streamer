@@ -40,15 +40,11 @@ public class MainActivity extends ActionBarActivity {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     MyCustomAdapter adapter;
     SearchView searchView;
+    ArrayList<ArtistEntry> artistEntries = new ArrayList<ArtistEntry>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        List<ArtistEntry> dataList = new ArrayList<ArtistEntry>();
-        adapter = new MyCustomAdapter(this,dataList);
-        ListView listView = (ListView)findViewById(R.id.lv_search_results);
-        listView.setEmptyView(findViewById(R.id.empty_list_view));
-        listView.setAdapter(adapter);
         searchView = (SearchView)findViewById(R.id.sv_artist_search);
         searchView.setIconifiedByDefault(false);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -65,6 +61,32 @@ public class MainActivity extends ActionBarActivity {
                 return false;
             }
         });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        List<ArtistEntry> dataList = new ArrayList<ArtistEntry>();
+        adapter = new MyCustomAdapter(this,artistEntries);
+        ListView listView = (ListView)findViewById(R.id.lv_search_results);
+        listView.setEmptyView(findViewById(R.id.empty_list_view));
+        listView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putParcelableArrayList("key", artistEntries);
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        artistEntries = savedInstanceState.getParcelableArrayList("key");
+
 
     }
 
@@ -133,7 +155,7 @@ public class MainActivity extends ActionBarActivity {
             JSONObject artists = artistJson.getJSONObject(SPOT_ARTISTS);
             JSONArray artistArray = artists.getJSONArray(SPOT_ITEMS);
             int listCount = artists.getInt(SPOT_TOTAL);
-            List<ArtistEntry> artistEntries = new ArrayList<ArtistEntry>();
+            artistEntries = new ArrayList<ArtistEntry>();
 
             for (int i=0; i<artistArray.length();i++){
                 JSONObject artistObject = artistArray.getJSONObject(i);
