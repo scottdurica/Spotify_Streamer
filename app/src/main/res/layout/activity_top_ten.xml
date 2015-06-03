@@ -19,7 +19,7 @@
         android:id="@+id/empty_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="No search results"
+        android:text="@string/no_search_results"
         android:gravity="center_vertical|center_horizontal"
         android:textSize="@dimen/text_size_large" />
 </RelativeLayout>

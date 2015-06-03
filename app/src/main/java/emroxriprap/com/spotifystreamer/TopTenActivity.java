@@ -52,11 +52,6 @@ public class TopTenActivity extends ActionBarActivity {
         bar.setSubtitle(artistName);
         FetchTopTenTask task = new FetchTopTenTask();
         task.execute(spotId);
-//        ArrayList<TopTenTrack> dataList = new ArrayList<TopTenTrack>();
-//        adapter = new MyCustomAdapter(this,dataList);
-//        ListView listView = (ListView)findViewById(R.id.lv_top_tracks);
-//        listView.setEmptyView(findViewById(R.id.empty_list_view));
-//        listView.setAdapter(adapter);
 
     }
 
@@ -204,7 +199,7 @@ public class TopTenActivity extends ActionBarActivity {
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //start new activity to play selected track...
+                    //TODO  Start new activity to play selected track...
                 }
             });
             return rowView;

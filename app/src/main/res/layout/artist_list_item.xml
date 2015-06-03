@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
+        android:text=""
         android:id="@+id/tv_artist_name"
         android:layout_alignTop="@+id/iv_small"
         android:layout_toRightOf="@+id/iv_small"
