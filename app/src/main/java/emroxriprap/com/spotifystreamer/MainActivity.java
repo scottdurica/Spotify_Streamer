@@ -36,6 +36,7 @@ import retrofit.client.Response;
 
 public class MainActivity extends ActionBarActivity {
     //this is a test to see how branches work.
+    private final String thisIsChange = "yesItis";
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     MyCustomAdapter adapter;
     SearchView searchView;
