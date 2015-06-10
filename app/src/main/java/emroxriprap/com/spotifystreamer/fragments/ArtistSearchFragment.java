@@ -59,7 +59,7 @@ public class ArtistSearchFragment extends Fragment
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
 
 
-        View rootView = inflater.inflate(R.layout.artist_search_fragment,container,false);
+        View rootView = inflater.inflate(R.layout.fragment_artist_search,container,false);
         mAdapter = new ArtistSearchAdapter(getActivity(),mArtistsEntries);
 
         ListView listView = (ListView)rootView.findViewById(R.id.lv_search_results);
