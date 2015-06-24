@@ -1,34 +1,40 @@
 package emroxriprap.com.spotifystreamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+
 import emroxriprap.com.spotifystreamer.fragments.ArtistSearchFragment;
+import emroxriprap.com.spotifystreamer.fragments.TopTenFragment;
+import emroxriprap.com.spotifystreamer.models.ArtistEntry;
+import emroxriprap.com.spotifystreamer.models.TopTenTrack;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ArtistSearchFragment.CallbackToActivity
+        ,TopTenFragment.CallbackToActivity{
 
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+//    private final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    public static boolean mTwoPane;
+    private static final String TOP_TEN_FRAGMENT_TAG = "ttft";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (findViewById(R.id.search_results_container) != null){
+            //must be a tablet
+            mTwoPane = true;
+        }else{
+            //its a phone
+            mTwoPane = false;
+        }
 
-
-    }
-
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        adapter = new ArtistSearchAdapter(this,artistEntries);
-//        ListView listView = (ListView)findViewById(R.id.lv_search_results);
-//        listView.setEmptyView(findViewById(R.id.empty_list_view));
-//        listView.setAdapter(adapter);
     }
 
     @Override
@@ -71,6 +77,35 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    @Override
+    public void onItemSelected(ArtistEntry artistEntry, int position) {
 
+        String spotId = artistEntry.getSpotifyId();
+        if (mTwoPane){
+            //tablet...load fragment
+            TopTenFragment fragment = new TopTenFragment();
+            Bundle arguments = new Bundle();
+            arguments.putString(TopTenFragment.FRAG_TAG,spotId);
+            fragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.search_results_container,fragment).commit();
+        }else{
+            //must be phone.. start new activity
+            Intent intent = new Intent(this,TopTenActivity.class);
+            intent.putExtra(TopTenFragment.FRAG_TAG,spotId);
+            startActivity(intent);
+        }
+    }
 
+    @Override
+    public void onItemSelected(ArrayList<TopTenTrack> list ,int position) {
+        //This is called from the TopTenFragment class- when on tablet
+        TopTenTrack t = list.get(position);
+        Intent intent = new Intent(this,PlayerActivity.class);
+        Bundle arguments = new Bundle();
+        arguments.putParcelableArrayList("list",list);
+        arguments.putInt("selected_position",position);
+        intent.putExtras(arguments);
+        startActivity(intent);
+    }
 }

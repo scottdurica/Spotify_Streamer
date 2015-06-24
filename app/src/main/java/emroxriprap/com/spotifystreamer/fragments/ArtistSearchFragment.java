@@ -1,11 +1,14 @@
 package emroxriprap.com.spotifystreamer.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -35,7 +38,13 @@ public class ArtistSearchFragment extends Fragment
     private ArtistSearchAdapter mAdapter;
     private SearchView searchView;
     public static ArrayList<ArtistEntry> mArtistsEntries = new ArrayList<ArtistEntry>();
-
+    private int mPosition = ListView.INVALID_POSITION;
+    private static final String SELECTED_POSITION = "selected_position_in_list";
+    private ListView listView;
+    public interface CallbackToActivity {
+        public void onItemSelected(ArtistEntry artistEntry,int position);
+//        public void onItemSelected(ArrayList<TopTenTrack>list, int position);
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,15 +54,21 @@ public class ArtistSearchFragment extends Fragment
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
         // When tablets rotate, the currently selected list item needs to be saved.
         // When no item is selected, mPosition will be set to Listview.INVALID_POSITION,
         // so check for that before storing.
-
+        if (mPosition != ListView.INVALID_POSITION){
+            savedInstanceState.putInt(SELECTED_POSITION, mPosition);
+        }
+        super.onSaveInstanceState(savedInstanceState);
 
     }
 
-
+    @Override
+    public void onResume() {
+        listView.smoothScrollToPosition(mPosition);
+        super.onResume();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container, Bundle savedInstanceState) {
@@ -62,20 +77,29 @@ public class ArtistSearchFragment extends Fragment
         View rootView = inflater.inflate(R.layout.fragment_artist_search,container,false);
         mAdapter = new ArtistSearchAdapter(getActivity(),mArtistsEntries);
 
-        ListView listView = (ListView)rootView.findViewById(R.id.lv_search_results);
+        listView = (ListView)rootView.findViewById(R.id.lv_search_results);
         listView.setEmptyView(rootView.findViewById(R.id.empty_list_view));
         listView.setAdapter(mAdapter);
 
         searchView = (SearchView)rootView.findViewById(R.id.sv_artist_search);
         searchView.setIconifiedByDefault(false);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ((CallbackToActivity)getActivity()).onItemSelected(mArtistsEntries.get(position),position);
+                mPosition = position;
+            }
+        });
 
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 pollSpotifyForArtists(query);
-//                Log.d(LOG_TAG, "Artist name sent to request is " + searchView.getQuery().toString());
+                InputMethodManager inputMethodManager = (InputMethodManager)getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(searchView.getWindowToken(),0);
                 return false;
             }
 
@@ -85,6 +109,10 @@ public class ArtistSearchFragment extends Fragment
                 return false;
             }
         });
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_POSITION)){
+            mPosition = savedInstanceState.getInt(SELECTED_POSITION);
+
+        }
 
         return rootView;
     }
@@ -105,8 +133,6 @@ public class ArtistSearchFragment extends Fragment
     }
 
     private void pollSpotifyForArtists(String artistName) {
-        //                FetchArtistTask task = new FetchArtistTask();
-//                task.execute(searchView.getQuery().toString());
         SpotifyApi api = new SpotifyApi();
         SpotifyService spotify = api.getService();
         Map map = new HashMap();
@@ -119,7 +145,6 @@ public class ArtistSearchFragment extends Fragment
                 List<Artist> artists = list.items;
                 for (Artist a: artists) {
                     String thumbImageUrl = null;
-//                          Log.d(LOG_TAG,"Artist ID is "+ a.id);
                     List<Image> images = a.images;
                     if (images != null) {
                         for (Image i : images) {
@@ -128,7 +153,6 @@ public class ArtistSearchFragment extends Fragment
                             }
                         }
                     }
-//                Log.d(LOG_TAG,"Thumbnail Image URL is "+thumbImageUrl);
                     ArtistEntry artistEntry = new ArtistEntry(a.id, a.name, thumbImageUrl);
                     artistsList.add(artistEntry);
                 }

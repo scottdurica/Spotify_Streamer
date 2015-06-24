@@ -38,15 +38,7 @@ public class ArtistSearchAdapter extends ArrayAdapter<ArtistEntry> {
         if (ae.getImageUrlString()!=null){
             Picasso.with(context).load(ae.getImageUrlString()).into(imageView);
         }
-//        rowView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(getContext(),TopTenActivity.class);
-//                intent.putExtra("id",ae.getSpotifyId());
-//                intent.putExtra("artist",ae.getArtistName());
-//                startActivity(intent);
-//            }
-//        });
+
         return rowView;
     }
 }

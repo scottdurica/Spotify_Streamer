@@ -28,7 +28,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
         </activity>
+        <activity
+            android:theme="@android:style/Theme.Holo.Light.DialogWhenLarge.NoActionBar"
 
+            android:name=".PlayerActivity"
+            android:label="@string/title_activity_player">
+        </activity>
     </application>
 
 </manifest>

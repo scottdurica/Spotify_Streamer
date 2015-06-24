@@ -13,7 +13,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="@dimen/text_margin_small" />
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +22,8 @@
         android:choiceMode="singleChoice"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/sv_artist_search" />
+        android:layout_below="@+id/sv_artist_search"
+        android:layout_marginBottom="@dimen/text_margin_small" />
     <TextView
         android:id="@+id/empty_list_view"
         android:layout_width="match_parent"
