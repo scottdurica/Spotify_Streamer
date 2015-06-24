@@ -103,8 +103,8 @@ public class MainActivity extends ActionBarActivity implements ArtistSearchFragm
         TopTenTrack t = list.get(position);
         Intent intent = new Intent(this,PlayerActivity.class);
         Bundle arguments = new Bundle();
-        arguments.putParcelableArrayList("list",list);
-        arguments.putInt("selected_position",position);
+        arguments.putParcelableArrayList(TopTenActivity.DATA_LIST,list);
+        arguments.putInt(TopTenActivity.SELECTED_POSITION,position);
         intent.putExtras(arguments);
         startActivity(intent);
     }
