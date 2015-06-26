@@ -1,4 +1,4 @@
-package emroxriprap.com.spotifystreamer;
+package emroxriprap.com.spotifystreamer.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,6 +12,8 @@ public class TopTenTrack implements Parcelable{
     private String songName;
     private String smImgUrl;
     private String lgImgUrl;
+    private String previewUrl;
+    private String artistName;
 
     public TopTenTrack() {
     }
@@ -21,12 +23,22 @@ public class TopTenTrack implements Parcelable{
         readFromParcel(in);
     }
 
-    public TopTenTrack(String albumName, String songName, String smImgUrl, String lgImgUrl) {
+    public TopTenTrack(String albumName, String songName, String smImgUrl, String lgImgUrl, String previewUrl,String artistName) {
         this.albumName = albumName;
         this.songName = songName;
         this.smImgUrl = smImgUrl;
         this.lgImgUrl = lgImgUrl;
+        this.previewUrl = previewUrl;
+        this.artistName = artistName;
     }
+
+    public String getPreviewUrl() {return previewUrl;}
+
+    public void setPreviewUrl(String previewUrl) {this.previewUrl = previewUrl;}
+
+    public String getArtistName() {return artistName;}
+
+    public void setArtistName(String artistName) {this.artistName = artistName;}
 
     public String getAlbumName() {
         return albumName;
@@ -71,12 +83,16 @@ public class TopTenTrack implements Parcelable{
         dest.writeString(songName);
         dest.writeString(smImgUrl);
         dest.writeString(lgImgUrl);
+        dest.writeString(previewUrl);
+        dest.writeString(artistName);
     }
     private void readFromParcel(Parcel in){
         albumName = in.readString();
         songName = in.readString();
         smImgUrl = in.readString();
         lgImgUrl = in.readString();
+        previewUrl = in.readString();
+        artistName = in.readString();
     }
     public static final Creator<TopTenTrack> CREATOR = new Parcelable.Creator<TopTenTrack>(){
 

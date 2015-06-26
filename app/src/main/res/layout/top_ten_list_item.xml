@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <ImageView
         android:layout_width="@dimen/thumb_w_h"
         android:layout_height="@dimen/thumb_w_h"
         android:id="@+id/iv_ttl_thumb_img"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+
         android:layout_margin="@dimen/thumb_margin"
-        android:src="@drawable/img_none" />
-
-    <TextView
-        android:layout_width="wrap_content"
+        android:src="@drawable/img_none"/>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/tv_ttl_song_name"
-        android:layout_alignTop="@+id/iv_ttl_thumb_img"
-        android:layout_toRightOf="@+id/iv_ttl_thumb_img"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="@dimen/text_margin_normal" />
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Medium Text"
+            android:id="@+id/tv_ttl_song_name"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
-        android:id="@+id/tv_ttl_album_name"
-        android:layout_below="@+id/tv_ttl_song_name"
-        android:layout_toRightOf="@+id/iv_ttl_thumb_img"
-        android:layout_alignRight="@+id/tv_ttl_song_name"
-        android:layout_alignEnd="@+id/tv_ttl_song_name"
-        android:layout_marginTop="@dimen/text_margin_small" />
+            android:layout_marginBottom="@dimen/text_margin_normal" />
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Small Text"
+            android:id="@+id/tv_ttl_album_name"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

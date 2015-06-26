@@ -6,5 +6,9 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_top_ten">TopTenActivity</string>
     <string name="no_search_results">No Search Results</string>
+    <string name="title_activity_artist_search_fragment">ArtistSearchFragment</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_player">PlayerActivity</string>
+    <string name="no_connection">Please check your internet connection and try again.</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package emroxriprap.com.spotifystreamer;
+package emroxriprap.com.spotifystreamer.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
