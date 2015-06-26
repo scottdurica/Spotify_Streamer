@@ -29,7 +29,9 @@ PlayerFragment fragment;
 
     @Override
     public void onBackPressed(){
-        PlayerFragment.mHandler.removeCallbacksAndMessages(null);
+        if (PlayerFragment.mHandler != null) {
+            PlayerFragment.mHandler.removeCallbacksAndMessages(null);
+        }
         PlayerFragment.mMediaPlayer.stop();
         PlayerFragment.mMediaPlayer.release();
         PlayerFragment.mMediaPlayer = null;

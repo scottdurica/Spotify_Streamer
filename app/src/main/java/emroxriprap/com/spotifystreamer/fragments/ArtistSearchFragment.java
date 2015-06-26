@@ -1,6 +1,8 @@
 package emroxriprap.com.spotifystreamer.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -96,7 +98,11 @@ public class ArtistSearchFragment extends Fragment
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                pollSpotifyForArtists(query);
+                if (isConnected()) {
+                    pollSpotifyForArtists(query);
+                }else{
+                    Toast.makeText(getActivity(),R.string.no_connection,Toast.LENGTH_SHORT).show();
+                }
                 InputMethodManager inputMethodManager = (InputMethodManager)getActivity()
                         .getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(searchView.getWindowToken(),0);
@@ -130,6 +136,13 @@ public class ArtistSearchFragment extends Fragment
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean isConnected() {
+        final ConnectivityManager connectivityManager = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean  connected = (activeNetwork != null && activeNetwork.isConnected()) ? true : false;
+        return connected;
     }
 
     private void pollSpotifyForArtists(String artistName) {

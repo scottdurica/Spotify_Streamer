@@ -33,7 +33,7 @@ public class TopTenFragment extends Fragment {
     private String mSpotifyId;
     public static final String FRAG_TAG = "tag";
     public static ArrayList<TopTenTrack> mTopTracks = new ArrayList<TopTenTrack>();
-    private TopTenAdapter mTopTenAdapter;
+    public static TopTenAdapter mTopTenAdapter;
 
     public interface CallbackToActivity {
         public void onItemSelected(ArrayList<TopTenTrack>list, int position);
@@ -78,13 +78,22 @@ public class TopTenFragment extends Fragment {
             }
         });
         if (mSpotifyId !=null){
-
-            pollSpotifyForTopTracks(mSpotifyId);
+            //If internet connection is available...
+//            if (isConnected()){
+                pollSpotifyForTopTracks(mSpotifyId);
+//            }else{
+//                Toast.makeText(getActivity(), R.string.no_connection, Toast.LENGTH_SHORT).show();
+//            }
         }
         return rootView;
     }
 
-
+//    public boolean isConnected() {
+//        final ConnectivityManager connectivityManager = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+//        final NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+//        boolean  connected = (activeNetwork != null && activeNetwork.isConnected()) ? true : false;
+//        return connected;
+//    }
     private void pollSpotifyForTopTracks(String spotifyId){
        final ArrayList<TopTenTrack> trackList = new ArrayList<TopTenTrack>();
        SpotifyApi api = new SpotifyApi();

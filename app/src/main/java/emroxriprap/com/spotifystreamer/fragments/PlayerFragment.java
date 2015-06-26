@@ -1,8 +1,11 @@
 package emroxriprap.com.spotifystreamer.fragments;
 
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -14,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -138,7 +142,12 @@ public class PlayerFragment extends Fragment implements View.OnClickListener {
 
 
     }
-
+    public boolean isConnected() {
+        final ConnectivityManager connectivityManager = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean  connected = (activeNetwork != null && activeNetwork.isConnected()) ? true : false;
+        return connected;
+    }
     private void setupSeekBar(View rootView) {
 
             seekBar = (SeekBar) rootView.findViewById(R.id.sb_player_grabber_bar);
@@ -165,55 +174,59 @@ public class PlayerFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        if (isConnected() == false){
+            Toast.makeText(getActivity(),R.string.no_connection,Toast.LENGTH_SHORT).show();
+        }else{
+            TopTenTrack newTrack = null;
+            switch (v.getId()){
+                case R.id.ib_player_play_pause:
 
-        TopTenTrack newTrack = null;
-        switch (v.getId()){
-            case R.id.ib_player_play_pause:
+                    if (playerState == PlayerState.PAUSED){
+                        mMediaPlayer.start();
+                        playerState = PlayerState.PLAYING;
+                    }else{
+                        mMediaPlayer.pause();
+                        playerState = PlayerState.PAUSED;
+                    }
+                    setButtonsForPlayerState();
+                    break;
+                case R.id.ib_player_next:
+                    chosenTrackPos = chosenTrackPos + 1;
+                    if (chosenTrackPos == trackList.size()){
+                        chosenTrackPos = 0;
+                    }
+                    newTrack = trackList.get(chosenTrackPos);
+                    mMediaPlayer.reset();
+                    url = newTrack.getPreviewUrl();
+                    startPlayer(url);
+                    songName.setText(newTrack.getSongName());
+                    artistName.setText(newTrack.getArtistName());
+                    albumName.setText(newTrack.getAlbumName());
+                    Picasso.with(getActivity()).load(newTrack.getLgImgUrl()).into(cover);
+                    break;
+                case R.id.ib_player_previous:
+                    chosenTrackPos = chosenTrackPos - 1;
+                    if (chosenTrackPos <0){
+                        chosenTrackPos = trackList.size()-1;
+                    }
+                    newTrack = trackList.get(chosenTrackPos);
+                    mMediaPlayer.reset();
+                    url = newTrack.getPreviewUrl();
+                    startPlayer(url);
+                    songName.setText(newTrack.getSongName());
+                    artistName.setText(newTrack.getArtistName());
+                    albumName.setText(newTrack.getAlbumName());
+                    Picasso.with(getActivity()).load(newTrack.getLgImgUrl()).into(cover);
+                    break;
 
-                if (playerState == PlayerState.PAUSED){
-                    mMediaPlayer.start();
-                    playerState = PlayerState.PLAYING;
-                }else{
-                    mMediaPlayer.pause();
-                    playerState = PlayerState.PAUSED;
-                }
-                setButtonsForPlayerState();
-                break;
-            case R.id.ib_player_next:
-                chosenTrackPos = chosenTrackPos + 1;
-                if (chosenTrackPos == trackList.size()){
-                    chosenTrackPos = 0;
-                }
-                newTrack = trackList.get(chosenTrackPos);
-                mMediaPlayer.reset();
-                url = newTrack.getPreviewUrl();
-                startPlayer(url);
-                songName.setText(newTrack.getSongName());
-                artistName.setText(newTrack.getArtistName());
-                albumName.setText(newTrack.getAlbumName());
-                Picasso.with(getActivity()).load(newTrack.getLgImgUrl()).into(cover);
-                break;
-            case R.id.ib_player_previous:
-                chosenTrackPos = chosenTrackPos - 1;
-                if (chosenTrackPos <0){
-                    chosenTrackPos = trackList.size()-1;
-                }
-                newTrack = trackList.get(chosenTrackPos);
-                mMediaPlayer.reset();
-                url = newTrack.getPreviewUrl();
-                startPlayer(url);
-                songName.setText(newTrack.getSongName());
-                artistName.setText(newTrack.getArtistName());
-                albumName.setText(newTrack.getAlbumName());
-                Picasso.with(getActivity()).load(newTrack.getLgImgUrl()).into(cover);
-                break;
+            }
 
+            if (newTrack != null){
+                currentTrack = newTrack;
+
+            }
         }
 
-        if (newTrack != null){
-            currentTrack = newTrack;
-
-        }
     }
     private void startPlayer(String url){
 

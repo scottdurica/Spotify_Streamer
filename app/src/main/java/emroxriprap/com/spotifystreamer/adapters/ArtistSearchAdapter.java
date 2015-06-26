@@ -29,16 +29,29 @@ public class ArtistSearchAdapter extends ArrayAdapter<ArtistEntry> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.artist_list_item,parent,false);
-        TextView artistName = (TextView)rowView.findViewById(R.id.tv_artist_name);
-        ImageView imageView = (ImageView)rowView.findViewById(R.id.iv_small);
+
+        ViewHolder holder;
+
+        if(convertView == null){
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.artist_list_item,parent,false);
+            holder = new ViewHolder();
+            holder.artistName = (TextView)convertView.findViewById(R.id.tv_artist_name);
+            holder.imageView = (ImageView)convertView.findViewById(R.id.iv_small);
+            convertView.setTag(holder);
+        }else{
+            holder = (ViewHolder)convertView.getTag();
+        }
         final ArtistEntry ae = list.get(position);
-        artistName.setText(ae.getArtistName());
+        holder.artistName.setText(ae.getArtistName());
         if (ae.getImageUrlString()!=null){
-            Picasso.with(context).load(ae.getImageUrlString()).into(imageView);
+            Picasso.with(context).load(ae.getImageUrlString()).into(holder.imageView);
         }
 
-        return rowView;
+        return convertView;
+    }
+    class ViewHolder {
+        TextView artistName;
+        ImageView imageView;
     }
 }

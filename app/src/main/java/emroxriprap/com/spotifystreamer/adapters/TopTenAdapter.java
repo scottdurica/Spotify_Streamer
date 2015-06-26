@@ -31,21 +31,35 @@ public class TopTenAdapter extends ArrayAdapter<TopTenTrack> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View rowView = inflater.inflate(R.layout.top_ten_list_item,parent,false);
-        TextView songName = (TextView)rowView.findViewById(R.id.tv_ttl_song_name);
-        TextView albumName = (TextView)rowView.findViewById(R.id.tv_ttl_album_name);
-        ImageView imageView = (ImageView)rowView.findViewById(R.id.iv_ttl_thumb_img);
+
+        ViewHolder holder;
+
+        if(convertView == null){
+            LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView= inflater.inflate(R.layout.top_ten_list_item,parent,false);
+            holder = new ViewHolder();
+            holder.albumName = (TextView)convertView.findViewById(R.id.tv_ttl_album_name);
+            holder.songName = (TextView)convertView.findViewById(R.id.tv_ttl_song_name);
+            holder.imageView = (ImageView)convertView.findViewById(R.id.iv_ttl_thumb_img);
+            convertView.setTag(holder);
+        }else{
+            holder = (ViewHolder) convertView.getTag();
+        }
         final TopTenTrack track = mList.get(position);
-        songName.setText(track.getSongName());
-        albumName.setText(track.getAlbumName());
+        holder.songName.setText(track.getSongName());
+        holder.albumName.setText(track.getAlbumName());
 
 
         if (track.getSmImgUrl()!=null){
-            Picasso.with(context).load(track.getSmImgUrl()).into(imageView);
+            Picasso.with(context).load(track.getSmImgUrl()).into(holder.imageView);
         }
 
 
-        return rowView;
+        return convertView;
+    }
+    class ViewHolder {
+        TextView songName;
+        TextView albumName;
+        ImageView imageView;
     }
 }
