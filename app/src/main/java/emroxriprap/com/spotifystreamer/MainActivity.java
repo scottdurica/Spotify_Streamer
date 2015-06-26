@@ -21,7 +21,7 @@ import emroxriprap.com.spotifystreamer.models.TopTenTrack;
 public class MainActivity extends ActionBarActivity implements ArtistSearchFragment.CallbackToActivity
         ,TopTenFragment.CallbackToActivity{
 
-//    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     public static boolean mTwoPane;
     private static final String TOP_TEN_FRAGMENT_TAG = "ttft";
